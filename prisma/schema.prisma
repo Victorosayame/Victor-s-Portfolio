@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum StackCategory {
+  FRONTEND
+  BACKEND
+  DATABASE
+  TOOL
+}
+
+enum ContactType {
+  EMAIL
+  GITHUB
+  LINKEDIN
+  X
+  OTHER
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Profile {
+  id            String   @id @default(cuid())
+
+  preferredName String
+  fullName      String
+
+  headline      String
+  bio           String
+
+  location      String
+
+  photoUrl      String?
+
+  availability  String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TechStack {
+  id        String        @id @default(cuid())
+
+  name      String
+  category  StackCategory
+
+  order     Int           @default(0)
+
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Project {
+  id         String   @id @default(cuid())
+
+  title      String
+  role       String
+
+  summary    String
+  outcome    String
+
+  imageUrl   String?
+
+  liveUrl    String?
+  repoUrl    String?
+  caseStudyUrl String?
+
+  featured   Boolean  @default(true)
+
+  order      Int      @default(0)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Resume {
+  id         String   @id @default(cuid())
+
+  fileName   String
+  fileUrl    String
+
+  uploadedAt DateTime @default(now())
+}
+
+model Contact {
+  id         String      @id @default(cuid())
+
+  label      String
+  href       String
+
+  type       ContactType
+
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
