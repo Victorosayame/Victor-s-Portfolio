@@ -41,13 +41,11 @@ const navItems = [
 
 type AdminShellProps = {
     children: React.ReactNode;
-    adminName: string;
 };
 
 
 export default function AdminShell({
     children,
-    adminName,
 }: AdminShellProps) {
 
     const pathname = usePathname();
@@ -108,12 +106,12 @@ export default function AdminShell({
                 className="flex items-center gap-3"
               >
                 <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-sm font-bold text-white">
-                  {adminName.charAt(0).toUpperCase()}
+                  A
                 </span>
 
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-foreground">
-                    {adminName}
+                    Admin
                   </p>
 
                   <p className="truncate text-xs text-text-muted">
@@ -247,11 +245,11 @@ export default function AdminShell({
 
           <Link href="/admin" className="ml-3 flex items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-xs font-bold text-white">
-              {adminName.charAt(0).toUpperCase()}
+              A
             </span>
 
             <span className="text-sm font-semibold text-foreground">
-              {adminName}
+              Admin
             </span>
 
             <span className="text-sm font-semibold text-foreground">
