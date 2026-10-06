@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { startTransition, useActionState, useState } from "react";
 
 import {
   saveProfile,
   type ProfileActionState,
 } from "@/actions/profile";
+import { upload } from "@vercel/blob/client";
 
 type ProfileFormProps = {
   profile: {
@@ -24,14 +25,67 @@ const initialState: ProfileActionState = {};
 export default function ProfileForm({
   profile,
 }: ProfileFormProps) {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+const [uploadingPhoto, setUploadingPhoto] = useState(false);
+const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+const [uploadError, setUploadError] = useState<string | null>(null);
   const [state, formAction, isPending] = useActionState(
     saveProfile,
     initialState,
   );
 
+  const isSaving = isPending || isUploadingPhoto;
+
   return (
     <form
-      action={formAction}
+      // action={formAction}
+      onSubmit={async (e) => {
+        e.preventDefault();
+
+        setUploadError(null);
+
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+
+        try {
+          let photoUrl = formData.get("photoUrl");
+
+          if (selectedFile) {
+            if (selectedFile.size > 5 * 1024 * 1024) {
+              setUploadError("Profile photo must be 5mb or smaller.");
+              return;
+            }
+
+            setUploadingPhoto(true);
+
+            const blob = await upload(
+              `profile/${selectedFile.name}`,
+              selectedFile,
+              {
+                access: "public",
+                handleUploadUrl: "/api/blob/upload",
+              },
+            );
+
+            photoUrl = blob.url;
+            formData.set("photoUrl", blob.url);
+          }
+
+          startTransition(() => {
+            formAction(formData);
+          })
+        } catch (error) {
+          console.error("Profile photo upload failed.", error);
+
+          setUploadError(
+            error instanceof Error
+            ? error.message
+            : "Unable to upload profile photo.",
+          );
+        } finally {
+          setUploadingPhoto(false);
+        }
+      }}
       className="space-y-6"
     >
       <section className="portfolio-panel p-6 sm:p-8">
@@ -139,17 +193,52 @@ export default function ProfileForm({
             htmlFor="photoUrl"
             className="text-sm font-medium text-foreground"
           >
-            Photo URL
+            Profile photo
           </label>
 
+           {profile?.photoUrl && (
+    <div className="mb-4">
+      <p className="mb-2 text-sm text-text-muted">
+        Current photo
+      </p>
+
+      <img
+        src={profile.photoUrl}
+        alt="Current profile"
+        className="h-32 w-32 rounded-2xl object-cover border border-border"
+      />
+    </div>
+  )}
+
           <input
-            id="photoUrl"
-            name="photoUrl"
-            type="url"
-            defaultValue={profile.photoUrl}
-            placeholder="https://..."
+            id="photo"
+            name="photo"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(e) => {
+              const file = e.target.files?.[0] ?? null;
+
+              setSelectedFile(file);
+              setUploadError(null);
+            }}
             className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none transition focus:border-accent"
           />
+
+          <input
+    type="hidden"
+    name="photoUrl"
+    defaultValue={profile?.photoUrl ?? ""}
+  />
+
+          <p className="mt-2 text-xs text-text-muted">
+    JPEG, PNG, or WebP. Maximum size: 5MB.
+  </p>
+
+  {uploadError && (
+    <p role="alert" className="mt-2 text-sm text-red-600">
+      {uploadError}
+    </p>
+  )}
         </div>
 
         <div className="mt-5 space-y-2">
@@ -191,10 +280,14 @@ export default function ProfileForm({
       <div className="flex justify-end">
         <button
           type="submit"
-          disabled={isPending}
+          disabled={isSaving}
           className="portfolio-button portfolio-button-primary disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isPending ? "Saving..." : "Save changes"}
+          {uploadingPhoto
+    ? "Uploading photo..."
+    : isPending
+      ? "Saving..."
+      : "Save profile"}
         </button>
       </div>
     </form>

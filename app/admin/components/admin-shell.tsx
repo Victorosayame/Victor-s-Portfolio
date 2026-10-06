@@ -39,11 +39,16 @@ const navItems = [
     },
 ];
 
+type AdminShellProps = {
+    children: React.ReactNode;
+    adminName: string;
+};
+
 
 export default function AdminShell({
     children,
-}: { children: React.ReactNode;    
-}) {
+    adminName,
+}: AdminShellProps) {
 
     const pathname = usePathname();
     const [collapsed, setCollapsed] = useState(false);
@@ -76,9 +81,7 @@ export default function AdminShell({
           "border-r border-border bg-surface/95 backdrop-blur-xl",
           "shadow-[0_10px_40px_rgb(47_58_72_/_0.06)]",
           "transition-[width,transform] duration-200",
-          mobileOpen
-            ? "translate-x-0"
-            : "-translate-x-full lg:translate-x-0",
+          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           collapsed ? "w-20" : "w-64",
         ].join(" ")}
       >
@@ -105,16 +108,16 @@ export default function AdminShell({
                 className="flex items-center gap-3"
               >
                 <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-sm font-bold text-white">
-                  B
+                  {adminName.charAt(0).toUpperCase()}
                 </span>
 
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-foreground">
-                    Bishop CMS
+                    {adminName}
                   </p>
 
                   <p className="truncate text-xs text-text-muted">
-                    Portfolio Admin
+                    Portfolio CMS
                   </p>
                 </div>
               </Link>
@@ -170,9 +173,7 @@ export default function AdminShell({
                   className={[
                     "group flex min-h-11 items-center rounded-xl",
                     "transition-colors duration-180",
-                    collapsed
-                      ? "justify-center px-2"
-                      : "gap-3 px-3",
+                    collapsed ? "justify-center px-2" : "gap-3 px-3",
                     active
                       ? "bg-accent text-white shadow-[0_8px_20px_rgb(200_167_90_/_0.18)]"
                       : "text-text-muted hover:bg-surface-muted hover:text-foreground",
@@ -213,17 +214,13 @@ export default function AdminShell({
                 "flex min-h-11 items-center rounded-xl",
                 "text-text-muted transition-colors duration-180",
                 "hover:bg-red-50 hover:text-red-600",
-                collapsed
-                  ? "w-11 justify-center"
-                  : "w-full gap-3 px-3",
+                collapsed ? "w-11 justify-center" : "w-full gap-3 px-3",
               ].join(" ")}
             >
               <LogOut className="h-[18px] w-[18px] shrink-0" />
 
               {!collapsed && (
-                <span className="text-sm font-medium">
-                  Logout
-                </span>
+                <span className="text-sm font-medium">Logout</span>
               )}
             </button>
           </form>
@@ -248,25 +245,23 @@ export default function AdminShell({
             <Menu className="h-5 w-5" />
           </button>
 
-          <Link
-            href="/admin"
-            className="ml-3 flex items-center gap-2"
-          >
+          <Link href="/admin" className="ml-3 flex items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-xs font-bold text-white">
-              B
+              {adminName.charAt(0).toUpperCase()}
             </span>
 
             <span className="text-sm font-semibold text-foreground">
-              Bishop CMS
+              {adminName}
+            </span>
+
+            <span className="text-sm font-semibold text-foreground">
+              Portfolio CMS
             </span>
           </Link>
         </header>
 
-        <main className="min-h-screen p-4 sm:p-6 lg:p-8">
-          {children}
-        </main>
+        <main className="min-h-screen p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
-
-  )
+  );
 }

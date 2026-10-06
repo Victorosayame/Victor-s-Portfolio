@@ -59,6 +59,7 @@ export async function saveProfile(
 
     revalidatePath("/");
     revalidatePath("/admin/profile");
+    revalidatePath("/admin", "layout");
 
     return {
         success: "Profile saved successfully."

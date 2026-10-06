@@ -6,10 +6,13 @@ import { useEffect, useState } from "react";
 const navLinks = [
   { label: "Work", href: "#work" },
   { label: "Resume", href: "#resume" },
-  { label: "Contact", href: "#contact" },
 ];
 
-export default function Navbar() {
+type NavbarProps = {
+  preferredName: string;
+};
+
+export default function Navbar({ preferredName }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -31,7 +34,7 @@ export default function Navbar() {
         }`}
       >
         <Link href="/" className="text-lg font-semibold tracking-tight">
-          Bishop
+          {preferredName}
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

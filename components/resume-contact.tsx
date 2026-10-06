@@ -1,10 +1,13 @@
-import type { PortfolioContent } from "@/lib/portfolio-content";
+import { getPublicContacts } from "@/lib/portfolio/get-public-contact";
+import { getPublicResume } from "@/lib/portfolio/get-public-resume";
+import CopyEmailButton from "./copy-email-button";
 
-type Props = {
-  content: PortfolioContent;
-};
+export default async function ResumeContact() {
+  const [resume, contacts] = await Promise.all([
+    getPublicResume(),
+    getPublicContacts(),
+  ]);
 
-export default function ResumeContact({ content }: Props) {
   return (
     <section
       id="resume"
@@ -21,34 +24,29 @@ export default function ResumeContact({ content }: Props) {
             </h2>
 
             <p className="portfolio-copy mt-6">
-              I’m open to frontend engineering, full stack development,
-              and product-focused opportunities. Whether you’re hiring,
-              collaborating, or simply want to connect—I’d love to hear from you.
+              I’m open to frontend engineering, full stack development, and
+              product-focused opportunities. Whether you’re hiring,
+              collaborating, or simply want to connect—I’d love to hear from
+              you.
             </p>
 
             <div className="portfolio-actions mt-10">
-              {content.resume.status === "ready" ? (
-                <>
-                  <a
-                    href={content.resume.viewHref!}
-                    className="portfolio-button portfolio-button-primary"
-                  >
-                    View Resume
-                  </a>
-
-                  <a
-                    href={content.resume.downloadHref!}
-                    className="portfolio-button portfolio-button-secondary"
-                  >
-                    Download PDF
-                  </a>
-                </>
+              {resume ? (
+                <a
+                  href={resume.fileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="portfolio-button portfolio-button-primary"
+                >
+                  View Resume
+                </a>
               ) : (
                 <div className="portfolio-pending rounded-2xl p-5">
                   <p className="font-medium">Resume coming before launch</p>
+
                   <p className="mt-2 text-sm">
-                    The download and preview actions are already wired into the
-                    portfolio and will activate once the final PDF is added.
+                    The resume will become available once the final PDF has been
+                    uploaded.
                   </p>
                 </div>
               )}
@@ -63,26 +61,40 @@ export default function ResumeContact({ content }: Props) {
             <p className="portfolio-kicker">Contact</p>
 
             <div className="mt-8 space-y-6">
-              {content.contactLinks.map((item) => (
-                <div key={item.label}>
-                  <p className="text-xs uppercase tracking-[0.08em] text-[var(--color-text-soft)]">
-                    {item.label}
-                  </p>
+              {contacts.map((item) => {
+                const isEmail = item.type === "EMAIL";
 
-                  {item.status === "ready" ? (
-                    <a
-                      href={item.href}
-                      className="mt-2 block text-lg font-medium text-[var(--color-text)] hover:text-[var(--color-accent)] transition-colors"
-                    >
-                      {item.href.replace("mailto:", "")}
-                    </a>
-                  ) : (
-                    <p className="mt-2 text-[var(--color-text-muted)]">
-                      {item.pendingMessage}
+                const displayValue = isEmail
+                  ? item.href.replace("mailto:", "")
+                  : item.href;
+
+                return (
+                  <div key={item.id}>
+                    <p className="text-xs uppercase tracking-[0.08em] text-[var(--color-text-soft)]">
+                      {item.label}
                     </p>
-                  )}
-                </div>
-              ))}
+
+                    {isEmail ? (
+                      <div className="mt-2 flex items-center gap-3">
+                        <p className="text-lg font-medium text-[var(--color-text)]">
+                          {displayValue}
+                        </p>
+
+                        <CopyEmailButton email={displayValue} />
+                      </div>
+                    ) : (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 block text-lg font-medium text-[var(--color-text)] transition-colors hover:text-[var(--color-accent)]"
+                      >
+                        {displayValue}
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="mt-10 border-t border-[var(--color-border)] pt-6">

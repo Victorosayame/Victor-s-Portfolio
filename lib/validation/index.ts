@@ -37,3 +37,70 @@ export const techStackSchema = z.object({
 });
 
 export type TechStackFormValues = z.infer<typeof techStackSchema>;
+
+export const projectSchema = z.object({
+    title: z.string().trim().min(1, "Project title is required.").max(100, "Project title is too long."),
+
+    role: z.string().trim().min(1, "Project role is required.").max(100, "Project role is too long."),
+
+    summary: z.string().trim().min(1, "Project summary is required.").max(5000, "Project summary is too long."),
+
+    outcome: z.string().trim().min(1, "Project outcome is required.").max(5000, "Project outcome is too long."),
+
+    imageUrl: z.union([
+        z.url().trim(),
+        z.literal(""),
+    ]),
+    liveUrl: z.union([
+        z.url().trim(),
+        z.literal(""),
+    ]),
+    repoUrl: z.union([
+        z.url().trim(),
+        z.literal(""),
+    ]),
+    caseStudyUrl: z.union([
+        z.url().trim(),
+        z.literal(""),
+    ]),
+
+    featured: z.boolean(),
+
+    order: z.coerce.number().int("Order must be a whole number.").min(0, "Order cannot be negative."),
+});
+
+export type ProjectFormValues = z.infer<typeof projectSchema>;
+
+export const resumeSchema = z.object({
+    fileName: z.string().trim().min(1, "Resume file name is required").max(160, "Resume file name is too long"),
+
+    fileUrl: z.url().trim(),
+})
+
+export type ResumeFormValues = z.infer<typeof resumeSchema>;
+
+
+export const contactSchema = z
+  .object({
+    label: z
+      .string()
+      .trim()
+      .min(1, "Contact label is required.")
+      .max(80, "Contact label is too long."),
+
+    href: z
+      .string()
+      .trim()
+      .min(1, "Contact value is required."),
+
+    type: z.enum([
+      "EMAIL",
+      "GITHUB",
+      "LINKEDIN",
+      "X",
+      "OTHER",
+    ]),
+  })
+
+export type ContactFormValues =
+  z.infer<typeof contactSchema>;
