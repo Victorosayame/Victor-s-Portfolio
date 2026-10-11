@@ -23,11 +23,11 @@ export default function AdminLoginPage() {
               href="/"
               className="text-2xl font-bold tracking-tight text-[var(--color-text)]"
             >
-              Bishop
+              Portfolio CMS
             </Link>
 
             <p className="mt-2 text-sm text-[var(--color-text-muted)]">
-              Portfolio CMS
+              Administration panel for managing your portfolio content.
             </p>
           </div>
 

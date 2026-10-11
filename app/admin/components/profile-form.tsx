@@ -2,10 +2,7 @@
 
 import { startTransition, useActionState, useState } from "react";
 
-import {
-  saveProfile,
-  type ProfileActionState,
-} from "@/actions/profile";
+import { saveProfile, type ProfileActionState } from "@/actions/profile";
 import { upload } from "@vercel/blob/client";
 
 type ProfileFormProps = {
@@ -22,13 +19,11 @@ type ProfileFormProps = {
 
 const initialState: ProfileActionState = {};
 
-export default function ProfileForm({
-  profile,
-}: ProfileFormProps) {
+export default function ProfileForm({ profile }: ProfileFormProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-const [uploadingPhoto, setUploadingPhoto] = useState(false);
-const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [state, formAction, isPending] = useActionState(
     saveProfile,
     initialState,
@@ -47,17 +42,18 @@ const [uploadError, setUploadError] = useState<string | null>(null);
         const form = e.currentTarget;
         const formData = new FormData(form);
 
-        try {
-          let photoUrl = formData.get("photoUrl");
+        // Remove the original file so it is not sent
+        // through the Next.js Server Action.
+        formData.delete("photo");
 
+        try {
           if (selectedFile) {
             if (selectedFile.size > 5 * 1024 * 1024) {
-              setUploadError("Profile photo must be 5mb or smaller.");
+              setUploadError("Profile photo must be 5 MB or smaller.");
               return;
             }
 
             setUploadingPhoto(true);
-
             const blob = await upload(
               `profile/${selectedFile.name}`,
               selectedFile,
@@ -67,20 +63,20 @@ const [uploadError, setUploadError] = useState<string | null>(null);
               },
             );
 
-            photoUrl = blob.url;
+            // Send only the uploaded image URL to the Server Action.
             formData.set("photoUrl", blob.url);
           }
 
           startTransition(() => {
             formAction(formData);
-          })
+          });
         } catch (error) {
           console.error("Profile photo upload failed.", error);
 
           setUploadError(
             error instanceof Error
-            ? error.message
-            : "Unable to upload profile photo.",
+              ? error.message
+              : "Unable to upload profile photo.",
           );
         } finally {
           setUploadingPhoto(false);
@@ -154,10 +150,7 @@ const [uploadError, setUploadError] = useState<string | null>(null);
         </div>
 
         <div className="mt-5 space-y-2">
-          <label
-            htmlFor="bio"
-            className="text-sm font-medium text-foreground"
-          >
+          <label htmlFor="bio" className="text-sm font-medium text-foreground">
             Bio
           </label>
 
@@ -196,19 +189,17 @@ const [uploadError, setUploadError] = useState<string | null>(null);
             Profile photo
           </label>
 
-           {profile?.photoUrl && (
-    <div className="mb-4">
-      <p className="mb-2 text-sm text-text-muted">
-        Current photo
-      </p>
+          {profile?.photoUrl && (
+            <div className="mb-4">
+              <p className="mb-2 text-sm text-text-muted">Current photo</p>
 
-      <img
-        src={profile.photoUrl}
-        alt="Current profile"
-        className="h-32 w-32 rounded-2xl object-cover border border-border"
-      />
-    </div>
-  )}
+              <img
+                src={profile.photoUrl}
+                alt="Current profile"
+                className="h-32 w-32 rounded-2xl object-cover border border-border"
+              />
+            </div>
+          )}
 
           <input
             id="photo"
@@ -225,20 +216,20 @@ const [uploadError, setUploadError] = useState<string | null>(null);
           />
 
           <input
-    type="hidden"
-    name="photoUrl"
-    defaultValue={profile?.photoUrl ?? ""}
-  />
+            type="hidden"
+            name="photoUrl"
+            defaultValue={profile?.photoUrl ?? ""}
+          />
 
           <p className="mt-2 text-xs text-text-muted">
-    JPEG, PNG, or WebP. Maximum size: 5MB.
-  </p>
+            JPEG, PNG, or WebP. Maximum size: 5MB.
+          </p>
 
-  {uploadError && (
-    <p role="alert" className="mt-2 text-sm text-red-600">
-      {uploadError}
-    </p>
-  )}
+          {uploadError && (
+            <p role="alert" className="mt-2 text-sm text-red-600">
+              {uploadError}
+            </p>
+          )}
         </div>
 
         <div className="mt-5 space-y-2">
@@ -284,10 +275,10 @@ const [uploadError, setUploadError] = useState<string | null>(null);
           className="portfolio-button portfolio-button-primary disabled:cursor-not-allowed disabled:opacity-60"
         >
           {uploadingPhoto
-    ? "Uploading photo..."
-    : isPending
-      ? "Saving..."
-      : "Save profile"}
+            ? "Uploading photo..."
+            : isPending
+              ? "Saving..."
+              : "Save profile"}
         </button>
       </div>
     </form>

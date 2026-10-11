@@ -54,6 +54,7 @@ const result = projectSchema.safeParse(normalizedData);
   });
 
   revalidatePath("/admin/projects");
+  revalidatePath("/");
 
      
     return {
