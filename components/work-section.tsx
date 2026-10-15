@@ -44,8 +44,7 @@ export default async function WorkSection() {
         </h2>
 
         <p className="portfolio-copy mt-5">
-          Three projects that best represent my approach to frontend
-          engineering—from real-time dashboards to secure banking experiences.
+          Projects that showcase how I design and build modern, full-stack web applications.
         </p>
       </div>
 
