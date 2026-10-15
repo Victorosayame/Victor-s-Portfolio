@@ -127,6 +127,7 @@ const result = projectSchema.safeParse(normalizedData);
             }
         }
 
+        revalidatePath("/");
         revalidatePath("/admin/projects");
 
         return {
@@ -157,6 +158,7 @@ const result = projectSchema.safeParse(normalizedData);
             }
         }
 
+        revalidatePath("/");
         revalidatePath("/admin/projects");
 
         return {
@@ -208,6 +210,7 @@ const result = projectSchema.safeParse(normalizedData);
     };
   }
 
+  revalidatePath("/");
   revalidatePath("/admin/projects");
 
   return {
@@ -308,6 +311,7 @@ export async function moveProject(
     ),
   );
 
+  revalidatePath("/");
   revalidatePath("/admin/projects");
 
   return {
